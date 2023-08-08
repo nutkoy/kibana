@@ -50,7 +50,7 @@ export interface AlertsTableProps {
   /**
    * Ids of alerts to display in the table
    */
-  alertIds: string[];
+  alertIds: string[] | undefined;
   /**
    * Data test subject string for testing
    */
@@ -62,7 +62,7 @@ export interface AlertsTableProps {
  */
 export const AlertsTable: FC<AlertsTableProps> = ({ alertIds, 'data-test-subj': dataTestSubj }) => {
   const { setPagination, setSorting, data, loading, paginationConfig, sorting, error } =
-    usePaginatedAlerts(alertIds);
+    usePaginatedAlerts(alertIds || []);
 
   const onTableChange = useCallback(
     ({ page, sort }: Criteria<Record<string, unknown>>) => {

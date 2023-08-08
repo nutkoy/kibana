@@ -5,16 +5,22 @@
  * 2.0.
  */
 
-import React, { useCallback, useMemo } from 'react';
+import React, { useCallback } from 'react';
 import { EuiButtonEmpty, EuiFlexGroup, EuiPanel } from '@elastic/eui';
 import { useExpandableFlyoutContext } from '@kbn/expandable-flyout';
-import { InsightsSummaryRow } from './insights_summary_row';
-import { useCorrelations } from '../../shared/hooks/use_correlations';
+import { useShowRelatedAlertsBySession } from '../../shared/hooks/use_show_related_alerts_by_session';
+import { RelatedAlertsBySession } from './related_alerts_by_session';
+import { useShowRelatedAlertsBySameSourceEvent } from '../../shared/hooks/use_show_related_alerts_by_same_source_event';
+import { RelatedAlertsBySameSourceEvent } from './related_alerts_by_same_source_event';
+import { RelatedAlertsByAncestry } from './related_alerts_by_ancestry';
+import { useShowRelatedAlertsByAncestry } from '../../shared/hooks/use_show_related_alerts_by_ancestry';
+import { RelatedCases } from './related_cases';
 import { INSIGHTS_CORRELATIONS_TEST_ID } from './test_ids';
 import { InsightsSubSection } from './insights_subsection';
 import { useRightPanelContext } from '../context';
 import { CORRELATIONS_TEXT, CORRELATIONS_TITLE, VIEW_ALL } from './translations';
 import { LeftPanelKey, LeftPanelInsightsTabPath } from '../../left';
+import { useShowRelatedCases } from '../../shared/hooks/use_show_related_cases';
 
 /**
  * Correlations section under Insights section, overview tab.
@@ -38,37 +44,39 @@ export const CorrelationsOverview: React.FC = () => {
     });
   }, [eventId, openLeftPanel, indexName, scopeId]);
 
-  const { loading, error, data } = useCorrelations({
-    eventId,
-    dataAsNestedObject,
+  const showCases = useShowRelatedCases();
+  const showAlertsByAncestry = useShowRelatedAlertsByAncestry({
     dataFormattedForFieldBrowser,
-    scopeId,
+    dataAsNestedObject,
   });
-
-  const correlationRows = useMemo(
-    () =>
-      data.map((d) => (
-        <InsightsSummaryRow
-          icon={d.icon}
-          value={d.value}
-          text={d.text}
-          data-test-subj={INSIGHTS_CORRELATIONS_TEST_ID}
-          key={`correlation-row-${d.text}`}
-        />
-      )),
-    [data]
-  );
+  const showSameSourceAlerts = useShowRelatedAlertsBySameSourceEvent({
+    dataFormattedForFieldBrowser,
+  });
+  const showAlertsBySession = useShowRelatedAlertsBySession({ dataFormattedForFieldBrowser });
 
   return (
-    <InsightsSubSection
-      loading={loading}
-      error={error}
-      title={CORRELATIONS_TITLE}
-      data-test-subj={INSIGHTS_CORRELATIONS_TEST_ID}
-    >
+    <InsightsSubSection title={CORRELATIONS_TITLE} data-test-subj={INSIGHTS_CORRELATIONS_TEST_ID}>
       <EuiPanel hasShadow={false} hasBorder={true} paddingSize="s">
         <EuiFlexGroup direction="column" gutterSize="none">
-          {correlationRows}
+          {showAlertsByAncestry && (
+            <RelatedAlertsByAncestry
+              dataFormattedForFieldBrowser={dataFormattedForFieldBrowser}
+              scopeId={scopeId}
+            />
+          )}
+          {showSameSourceAlerts && (
+            <RelatedAlertsBySameSourceEvent
+              dataFormattedForFieldBrowser={dataFormattedForFieldBrowser}
+              scopeId={scopeId}
+            />
+          )}
+          {showAlertsBySession && (
+            <RelatedAlertsBySession
+              dataFormattedForFieldBrowser={dataFormattedForFieldBrowser}
+              scopeId={scopeId}
+            />
+          )}
+          {showCases && <RelatedCases eventId={eventId} />}
         </EuiFlexGroup>
       </EuiPanel>
       <EuiButtonEmpty
