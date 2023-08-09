@@ -22,7 +22,7 @@ else
   for i in {1..5};
   do
     echo "--- Running performance tests #$i"
-    node scripts/run_performance.js --kibana-install-dir "$KIBANA_BUILD_LOCATION" --journey x-pack/performance/journeys/many_fields_lens_editor.ts
+    node scripts/run_performance.js --kibana-install-dir "$KIBANA_BUILD_LOCATION" --journey-path x-pack/performance/journeys/many_fields_lens_editor.ts
     sleep 120
   done
 fi
