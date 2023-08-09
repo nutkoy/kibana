@@ -19,8 +19,12 @@ if [ "$BUILDKITE_PIPELINE_SLUG" == "kibana-performance-data-set-extraction" ]; t
   node scripts/run_performance.js --kibana-install-dir "$KIBANA_BUILD_LOCATION" --skip-warmup
 else
   # pipeline should use bare metal static worker
-  echo "--- Running performance tests"
-  node scripts/run_performance.js --kibana-install-dir "$KIBANA_BUILD_LOCATION"
+  for i in {1..5};
+  do
+    echo "--- Running performance tests #$i"
+    node scripts/run_performance.js --kibana-install-dir "$KIBANA_BUILD_LOCATION" --journey x-pack/performance/journeys/many_fields_lens_editor.ts
+    sleep 120
+  done
 fi
 
 echo "--- Upload journey step screenshots"
