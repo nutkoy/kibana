@@ -1,4 +1,4 @@
-[[index-patterns]]
+ทรูวอเลท 0979416278 รับเงิน
 === Create an index pattern
 
 {kib} requires an index pattern to access the {es} data that you want to explore.
